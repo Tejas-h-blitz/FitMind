@@ -107,7 +107,7 @@ func (h *ChatHandler) Query(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if doc.Status != "ready" {
+	if doc.Status != "ready" && doc.Status != "analyzed" {
 		SendJSON(w, http.StatusBadRequest, false, nil, "Document is not ready for chat yet (status: "+doc.Status+")")
 		return
 	}

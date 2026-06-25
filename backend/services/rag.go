@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -80,3 +81,67 @@ func (r *RAGService) QueryStream(query, userID, docID string, chatHistory []inte
 
 	return resp, nil
 }
+
+func (r *RAGService) GenerateMealPlan(userID, docID, preference string) ([]byte, error) {
+	payload := map[string]string{
+		"user_id":            userID,
+		"doc_id":             docID,
+		"dietary_preference": preference,
+	}
+
+	jsonBytes, err := json.Marshal(payload)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal meal plan payload: %w", err)
+	}
+
+	url := fmt.Sprintf("%s/meal-plan", r.url)
+	resp, err := r.client.Post(url, "application/json", bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return nil, fmt.Errorf("failed to call meal plan microservice: %w", err)
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read meal plan response: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("meal plan service returned status code %d: %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	return bodyBytes, nil
+}
+
+func (r *RAGService) GenerateWorkoutPlan(userID, fitnessLevel, equipment string, daysPerWeek int) ([]byte, error) {
+	payload := map[string]interface{}{
+		"user_id":       userID,
+		"fitness_level": fitnessLevel,
+		"equipment":     equipment,
+		"days_per_week": daysPerWeek,
+	}
+
+	jsonBytes, err := json.Marshal(payload)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal workout plan payload: %w", err)
+	}
+
+	url := fmt.Sprintf("%s/workout-plan", r.url)
+	resp, err := r.client.Post(url, "application/json", bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return nil, fmt.Errorf("failed to call workout plan microservice: %w", err)
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read workout plan response: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("workout plan service returned status code %d: %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	return bodyBytes, nil
+}
+

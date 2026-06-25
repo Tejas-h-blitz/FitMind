@@ -147,6 +147,61 @@ $$ language plpgsql security definer;
 create or replace trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- New Tables for Tier 1 AI Features
+
+create table if not exists document_analyses (
+  id uuid primary key default gen_random_uuid(),
+  doc_id uuid references documents on delete cascade not null unique,
+  user_id uuid references auth.users not null,
+  metrics jsonb not null,
+  summary text not null,
+  overall_status text not null,
+  created_at timestamptz default now()
+);
+
+alter table document_analyses enable row level security;
+create policy "Users can only access own analyses"
+  on document_analyses for all
+  using (auth.uid() = user_id);
+
+create table if not exists meal_plans (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users not null,
+  doc_id uuid references documents on delete cascade,
+  reasoning text,
+  daily_calories_target int,
+  protein_target_g int,
+  days jsonb not null,
+  weekly_notes text,
+  dietary_preference text,
+  created_at timestamptz default now()
+);
+
+alter table meal_plans enable row level security;
+create policy "Users can only access own meal plans"
+  on meal_plans for all
+  using (auth.uid() = user_id);
+
+create table if not exists workout_plans (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users not null,
+  program_name text,
+  duration_weeks int,
+  reasoning text,
+  weekly_schedule jsonb not null,
+  progression_notes text,
+  safety_notes text,
+  fitness_level text,
+  equipment text,
+  days_per_week int,
+  created_at timestamptz default now()
+);
+
+alter table workout_plans enable row level security;
+create policy "Users can only access own workout plans"
+  on workout_plans for all
+  using (auth.uid() = user_id);
 ```
 
 *Note: Ensure you create a storage bucket in Supabase called `documents` and configure its permissions to allow authenticated uploads under user folders.*

@@ -43,6 +43,9 @@ func main() {
 	docHandler := handlers.NewDocumentsHandler(sbService, qdService, ragService)
 	chatHandler := handlers.NewChatHandler(sbService, ragService)
 	healthHandler := handlers.NewHealthHandler(sbService)
+	analyzerHandler := handlers.NewAnalyzerHandler(sbService)
+	mealPlanHandler := handlers.NewMealPlanHandler(sbService, ragService)
+	workoutPlanHandler := handlers.NewWorkoutPlanHandler(sbService, ragService)
 
 	// Router Setup
 	r := chi.NewRouter()
@@ -73,6 +76,7 @@ func main() {
 		r.Post("/documents/upload", docHandler.Upload)
 		r.Delete("/documents/{id}", docHandler.Delete)
 		r.Get("/documents/{id}/status", docHandler.GetStatus)
+		r.Get("/documents/{id}/analysis", analyzerHandler.GetAnalysis)
 
 		// Chat
 		r.Get("/chat/{docId}/history", chatHandler.GetHistory)
@@ -85,6 +89,16 @@ func main() {
 		r.Get("/health/goals", healthHandler.GetGoals)
 		r.Post("/health/goals", healthHandler.CreateGoal)
 		r.Patch("/health/goals/{id}", healthHandler.UpdateGoal)
+
+		// Meal Plans
+		r.Post("/meal-plan/generate", mealPlanHandler.Generate)
+		r.Get("/meal-plan/latest", mealPlanHandler.GetLatest)
+		r.Delete("/meal-plan/{id}", mealPlanHandler.Delete)
+
+		// Workout Plans
+		r.Post("/workout-plan/generate", workoutPlanHandler.Generate)
+		r.Get("/workout-plan/latest", workoutPlanHandler.GetLatest)
+		r.Delete("/workout-plan/{id}", workoutPlanHandler.Delete)
 	})
 
 	// HTTP Server Configuration

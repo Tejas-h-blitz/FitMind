@@ -439,3 +439,139 @@ func (s *SupabaseService) DeleteFile(storagePath string) error {
 
 	return nil
 }
+
+// Document Analysis Operations
+func (s *SupabaseService) GetDocumentAnalysis(docID, userID string) (*models.DocumentAnalysis, error) {
+	req, err := s.newRequest("GET", "/rest/v1/document_analyses?doc_id=eq."+docID+"&user_id=eq."+userID+"&select=*", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, code, err := s.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	if code != 200 {
+		return nil, fmt.Errorf("failed to get document analysis, status: %d, response: %s", code, string(body))
+	}
+
+	var analyses []models.DocumentAnalysis
+	if err := json.Unmarshal(body, &analyses); err != nil {
+		return nil, err
+	}
+
+	if len(analyses) == 0 {
+		return nil, nil
+	}
+	return &analyses[0], nil
+}
+
+func (s *SupabaseService) SaveDocumentAnalysis(docID, userID string, analysis *models.DocumentAnalysis) error {
+	analysis.DocID = docID
+	analysis.UserID = userID
+	jsonBytes, err := json.Marshal(analysis)
+	if err != nil {
+		return err
+	}
+
+	req, err := s.newRequest("POST", "/rest/v1/document_analyses", bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Prefer", "resolution=merge-duplicates")
+
+	body, code, err := s.doRequest(req)
+	if err != nil {
+		return err
+	}
+	if code != 201 && code != 200 && code != 204 {
+		return fmt.Errorf("failed to save document analysis, status: %d, response: %s", code, string(body))
+	}
+	return nil
+}
+
+// Meal Plan Operations
+func (s *SupabaseService) GetLatestMealPlan(userID string) (*models.MealPlan, error) {
+	req, err := s.newRequest("GET", "/rest/v1/meal_plans?user_id=eq."+userID+"&order=created_at.desc&limit=1&select=*", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, code, err := s.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	if code != 200 {
+		return nil, fmt.Errorf("failed to get latest meal plan, status: %d, response: %s", code, string(body))
+	}
+
+	var plans []models.MealPlan
+	if err := json.Unmarshal(body, &plans); err != nil {
+		return nil, err
+	}
+
+	if len(plans) == 0 {
+		return nil, nil
+	}
+	return &plans[0], nil
+}
+
+func (s *SupabaseService) DeleteMealPlan(mealPlanID, userID string) error {
+	req, err := s.newRequest("DELETE", "/rest/v1/meal_plans?id=eq."+mealPlanID+"&user_id=eq."+userID, nil)
+	if err != nil {
+		return err
+	}
+
+	body, code, err := s.doRequest(req)
+	if err != nil {
+		return err
+	}
+	if code != 200 && code != 204 {
+		return fmt.Errorf("failed to delete meal plan, status: %d, response: %s", code, string(body))
+	}
+	return nil
+}
+
+// Workout Plan Operations
+func (s *SupabaseService) GetLatestWorkoutPlan(userID string) (*models.WorkoutPlan, error) {
+	req, err := s.newRequest("GET", "/rest/v1/workout_plans?user_id=eq."+userID+"&order=created_at.desc&limit=1&select=*", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, code, err := s.doRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	if code != 200 {
+		return nil, fmt.Errorf("failed to get latest workout plan, status: %d, response: %s", code, string(body))
+	}
+
+	var plans []models.WorkoutPlan
+	if err := json.Unmarshal(body, &plans); err != nil {
+		return nil, err
+	}
+
+	if len(plans) == 0 {
+		return nil, nil
+	}
+	return &plans[0], nil
+}
+
+func (s *SupabaseService) DeleteWorkoutPlan(workoutPlanID, userID string) error {
+	req, err := s.newRequest("DELETE", "/rest/v1/workout_plans?id=eq."+workoutPlanID+"&user_id=eq."+userID, nil)
+	if err != nil {
+		return err
+	}
+
+	body, code, err := s.doRequest(req)
+	if err != nil {
+		return err
+	}
+	if code != 200 && code != 204 {
+		return fmt.Errorf("failed to delete workout plan, status: %d, response: %s", code, string(body))
+	}
+	return nil
+}
+

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { supabase } from '$lib/supabase';
 	import { page } from '$app/state';
-	import { Flame, Brain, LogOut, LayoutDashboard, Upload } from 'lucide-svelte';
+	import { Flame, Brain, LogOut, LayoutDashboard, Upload, Utensils, Dumbbell } from 'lucide-svelte';
 
 	let { streakCount = 0 } = $props<{ streakCount?: number }>();
 
@@ -38,6 +38,20 @@
 					>
 						<Upload class="h-4 w-4" />
 						<span>Upload Files</span>
+					</a>
+					<a
+						href="/meal-plan"
+						class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors {page.url.pathname === '/meal-plan' ? 'text-emerald-400 bg-emerald-950/30' : 'text-slate-300 hover:text-white hover:bg-slate-900'}"
+					>
+						<Utensils class="h-4 w-4" />
+						<span>Meal Plan</span>
+					</a>
+					<a
+						href="/workout"
+						class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors {page.url.pathname === '/workout' ? 'text-emerald-400 bg-emerald-950/30' : 'text-slate-300 hover:text-white hover:bg-slate-900'}"
+					>
+						<Dumbbell class="h-4 w-4" />
+						<span>Workout</span>
 					</a>
 				</div>
 

@@ -4,7 +4,7 @@
 	import DocumentCard from '$lib/components/DocumentCard.svelte';
 	import BMITracker from '$lib/components/BMITracker.svelte';
 	import GoalCard from '$lib/components/GoalCard.svelte';
-	import { FilePlus2, CheckCircle, Target, RefreshCw, Plus, Calendar, Flame, Brain, Dumbbell } from 'lucide-svelte';
+import { FilePlus2, CheckCircle, Target, RefreshCw, Plus, Calendar, Flame, Brain, Dumbbell, Utensils } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
 	let documents = $state<Document[]>([]);
@@ -217,9 +217,55 @@
 				<BMITracker {metrics} onLog={handleLogBMI} />
 			</div>
 
-			<!-- Right Column: Goals Checklist -->
+			<!-- Right Column: AI Planners + Goals Checklist -->
 			<div class="space-y-8">
-				<section class="rounded-xl border border-slate-850 bg-slate-900/10 p-6 shadow-xl backdrop-blur-sm">
+				<!-- AI Planners Card -->
+				<section class="rounded-xl border border-slate-800/80 bg-slate-900/30 p-6 shadow-xl backdrop-blur-sm">
+					<div class="flex items-center gap-2 mb-4">
+						<div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">
+							<Brain class="h-5 w-5" />
+						</div>
+						<h2 class="text-base font-bold text-slate-100">AI Health Planners</h2>
+					</div>
+					<p class="text-xs text-slate-400 mb-4 leading-relaxed">
+						Generate fully personalized programs tailored to your specific health report analyses, BMI tracker log, and fitness milestones.
+					</p>
+					<div class="grid grid-cols-1 gap-3">
+						<a
+							href="/meal-plan"
+							class="flex items-center justify-between p-3.5 rounded-xl border border-slate-800 bg-slate-950/40 hover:border-emerald-500/40 hover:bg-slate-900/35 transition-all group cursor-pointer"
+						>
+							<div class="flex items-center gap-3">
+								<div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500/20 transition-all">
+									<Utensils class="h-5 w-5" />
+								</div>
+								<div class="text-left">
+									<span class="block text-sm font-semibold text-slate-200">Meal Planner</span>
+									<span class="block text-[11px] text-slate-500">AI-generated diet based on reports</span>
+								</div>
+							</div>
+							<span class="text-slate-500 group-hover:text-emerald-400 transition-colors">→</span>
+						</a>
+
+						<a
+							href="/workout"
+							class="flex items-center justify-between p-3.5 rounded-xl border border-slate-800 bg-slate-950/40 hover:border-emerald-500/40 hover:bg-slate-900/35 transition-all group cursor-pointer"
+						>
+							<div class="flex items-center gap-3">
+								<div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500/20 transition-all">
+									<Dumbbell class="h-5 w-5" />
+								</div>
+								<div class="text-left">
+									<span class="block text-sm font-semibold text-slate-200">Workout Planner</span>
+									<span class="block text-[11px] text-slate-500">4-week training program</span>
+								</div>
+							</div>
+							<span class="text-slate-500 group-hover:text-emerald-400 transition-colors">→</span>
+						</a>
+					</div>
+				</section>
+
+				<section class="rounded-xl border border-slate-800/85 bg-slate-900/30 p-6 shadow-xl backdrop-blur-sm">
 					<div class="flex items-center gap-2 mb-6">
 						<div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">
 							<Target class="h-5 w-5" />

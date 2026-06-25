@@ -21,9 +21,98 @@ export interface Document {
 	name: string;
 	size: number;
 	storage_path: string;
-	status: 'pending' | 'processing' | 'ready' | 'failed';
+	status: 'pending' | 'processing' | 'ready' | 'failed' | 'analyzed';
 	created_at: string;
 }
+
+export interface DocumentHealthMetric {
+	name: string;
+	value: number;
+	unit: string;
+	status: 'normal' | 'low' | 'high' | 'borderline';
+	reference_range: string;
+	plain_english: string;
+}
+
+export interface DocumentAnalysis {
+	id: string;
+	doc_id: string;
+	user_id: string;
+	metrics: DocumentHealthMetric[];
+	summary: string;
+	overall_status: 'good' | 'needs_attention' | 'concerning';
+	created_at: string;
+}
+
+export interface MealItem {
+	name: string;
+	ingredients: string[];
+	calories: number;
+	benefits: string;
+}
+
+export interface DayMeals {
+	breakfast: MealItem;
+	lunch: MealItem;
+	dinner: MealItem;
+	snacks: MealItem;
+}
+
+export interface MealDay {
+	day: string;
+	meals: DayMeals;
+	daily_tip: string;
+}
+
+export interface MealPlan {
+	id: string;
+	user_id: string;
+	doc_id: string;
+	reasoning: string;
+	daily_calories_target: number;
+	protein_target_g: number;
+	days: MealDay[];
+	weekly_notes: string;
+	dietary_preference: string;
+	created_at: string;
+}
+
+export interface Exercise {
+	name: string;
+	sets: number;
+	reps: string;
+	rest_seconds: number;
+	instructions: string;
+	muscle_groups: string[];
+	modification_easier: string;
+	modification_harder: string;
+}
+
+export interface WorkoutDay {
+	day: string;
+	focus: string;
+	is_rest_day: boolean;
+	exercises: Exercise[];
+	estimated_duration_minutes: number;
+	warmup: string;
+	cooldown: string;
+}
+
+export interface WorkoutPlan {
+	id: string;
+	user_id: string;
+	program_name: string;
+	duration_weeks: number;
+	reasoning: string;
+	weekly_schedule: WorkoutDay[];
+	progression_notes: string;
+	safety_notes: string;
+	fitness_level: 'beginner' | 'intermediate' | 'advanced';
+	equipment: 'none' | 'home' | 'full_gym';
+	days_per_week: number;
+	created_at: string;
+}
+
 
 export interface SourceChunk {
 	text: string;
@@ -139,5 +228,20 @@ export const api = {
 		request<Goal>('POST', '/api/health/goals', { title, target_date: targetDate }),
 		
 	updateGoalStatus: (id: string, status: 'active' | 'completed') => 
-		request<{ id: string; status: string }>('PATCH', `/api/health/goals/${id}`, { status })
+		request<{ id: string; status: string }>('PATCH', `/api/health/goals/${id}`, { status }),
+
+	// Document Analysis
+	getDocumentAnalysis: (docId: string) => request<DocumentAnalysis>('GET', `/api/documents/${docId}/analysis`),
+
+	// Meal Plans
+	generateMealPlan: (docId: string, dietaryPreference: string) =>
+		request<MealPlan>('POST', '/api/meal-plan/generate', { doc_id: docId, dietary_preference: dietaryPreference }),
+	getLatestMealPlan: () => request<MealPlan>('GET', '/api/meal-plan/latest'),
+	deleteMealPlan: (id: string) => request<{ message: string }>('DELETE', `/api/meal-plan/${id}`),
+
+	// Workout Plans
+	generateWorkoutPlan: (fitnessLevel: string, equipment: string, daysPerWeek: number) =>
+		request<WorkoutPlan>('POST', '/api/workout-plan/generate', { fitness_level: fitnessLevel, equipment, days_per_week: daysPerWeek }),
+	getLatestWorkoutPlan: () => request<WorkoutPlan>('GET', '/api/workout-plan/latest'),
+	deleteWorkoutPlan: (id: string) => request<{ message: string }>('DELETE', `/api/workout-plan/${id}`)
 };

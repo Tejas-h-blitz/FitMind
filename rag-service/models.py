@@ -23,3 +23,19 @@ class QueryRequest(BaseModel):
 class SourceChunk(BaseModel):
     text: str
     page_number: int
+
+class AnalysisRequest(BaseModel):
+    doc_id: str
+    user_id: str
+
+class MealPlanRequest(BaseModel):
+    user_id: str
+    doc_id: str
+    dietary_preference: str  # vegetarian, non-vegetarian, vegan
+
+class WorkoutPlanRequest(BaseModel):
+    user_id: str
+    fitness_level: str  # beginner, intermediate, advanced
+    equipment: str  # none, home, full_gym
+    days_per_week: int
+

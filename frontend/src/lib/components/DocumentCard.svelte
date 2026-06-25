@@ -58,7 +58,12 @@
 
 		<!-- Status Badge -->
 		<div>
-			{#if document.status === 'ready'}
+			{#if document.status === 'analyzed'}
+				<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-950/40 border border-emerald-500/30 text-emerald-400">
+					<CheckCircle class="h-3 w-3" />
+					Analyzed
+				</span>
+			{:else if document.status === 'ready'}
 				<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-950/40 border border-emerald-500/30 text-emerald-400">
 					<CheckCircle class="h-3 w-3" />
 					Ready
@@ -96,7 +101,7 @@
 		</button>
 
 		<!-- Chat Action -->
-		{#if document.status === 'ready'}
+		{#if document.status === 'ready' || document.status === 'analyzed'}
 			<a
 				href="/chat/{document.id}"
 				class="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 border border-emerald-500/20 hover:border-emerald-400/20 rounded-md transition-all cursor-pointer shadow-sm shadow-emerald-950/50"

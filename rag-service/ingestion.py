@@ -8,6 +8,8 @@ from llama_index.core.node_parser import TokenTextSplitter
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 import logging
+from analyzer import analyze_document_text
+
 
 logger = logging.getLogger(__name__)
 
@@ -101,4 +103,39 @@ def ingest_document(user_id: str, doc_id: str, storage_path: str):
         embed_model=embed_model
     )
     logger.info(f"Successfully ingested and indexed doc_id={doc_id} for user_id={user_id}")
+    
+    # 6. Automatically run analysis
+    try:
+        logger.info(f"Running automated analysis for doc_id={doc_id}")
+        full_text = "\n".join([doc.text for doc in documents_list])
+        analysis_result = analyze_document_text(full_text)
+        
+        supabase = get_supabase_client()
+        
+        # Save analysis result
+        analysis_data = {
+            "doc_id": doc_id,
+            "user_id": user_id,
+            "metrics": analysis_result.get("metrics", []),
+            "summary": analysis_result.get("summary", ""),
+            "overall_status": analysis_result.get("overall_status", "good")
+        }
+        
+        logger.info(f"Saving analysis result to Supabase for doc_id={doc_id}")
+        supabase.table("document_analyses").insert(analysis_data).execute()
+        
+        # Update document status to 'analyzed'
+        logger.info(f"Updating document status to 'analyzed' for doc_id={doc_id}")
+        supabase.table("documents").update({"status": "analyzed"}).eq("id", doc_id).execute()
+        
+    except Exception as e:
+        logger.error(f"Failed to automatically analyze document: {str(e)}")
+        # Even if analysis fails, vector indexing succeeded. We set it to ready.
+        try:
+            supabase = get_supabase_client()
+            supabase.table("documents").update({"status": "ready"}).eq("id", doc_id).execute()
+        except Exception as db_err:
+            logger.error(f"Failed to update document status to ready: {str(db_err)}")
+            
     return len(nodes)
+
