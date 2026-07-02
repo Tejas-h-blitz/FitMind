@@ -11,7 +11,10 @@ def analyze_document_text(text: str) -> dict:
         logger.error("OPENAI_API_KEY is not set in environment variables")
         raise ValueError("OPENAI_API_KEY must be set in the environment variables")
 
-    client = OpenAI(api_key=api_key)
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://api.groq.com/openai/v1"
+    )
 
     # Building the exact prompt requested
     prompt = (
@@ -53,9 +56,9 @@ def analyze_document_text(text: str) -> dict:
     )
 
     try:
-        logger.info("Sending request to GPT-4o for document analysis")
+        logger.info("Sending request to Groq for document analysis")
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="llama3-70b-8192",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
             temperature=0.1

@@ -87,7 +87,7 @@
 {/if}
 
 <style>
-	:global(@keyframes slideDown) {
+	@keyframes slideDown {
 		from { opacity: 0; transform: translateY(-5px); }
 		to { opacity: 1; transform: translateY(0); }
 	}

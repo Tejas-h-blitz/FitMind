@@ -21,7 +21,10 @@ def generate_meal_plan(analysis: dict, goals: list, bmi: float, dietary_preferen
         logger.error("OPENAI_API_KEY is not set in environment variables")
         raise ValueError("OPENAI_API_KEY must be set in the environment variables")
 
-    client = OpenAI(api_key=api_key)
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://api.groq.com/openai/v1"
+    )
 
     # 1. Format deficiencies
     metrics = analysis.get("metrics", [])
@@ -95,9 +98,9 @@ def generate_meal_plan(analysis: dict, goals: list, bmi: float, dietary_preferen
     )
 
     try:
-        logger.info("Sending request to GPT-4o for meal planning")
+        logger.info("Sending request to Groq for meal planning")
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="llama3-70b-8192",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
             temperature=0.2

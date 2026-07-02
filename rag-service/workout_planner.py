@@ -21,7 +21,10 @@ def generate_workout_plan(bmi: float, goals: list, fitness_level: str, equipment
         logger.error("OPENAI_API_KEY is not set in environment variables")
         raise ValueError("OPENAI_API_KEY must be set in the environment variables")
 
-    client = OpenAI(api_key=api_key)
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://api.groq.com/openai/v1"
+    )
 
     # 1. Format goals
     goals_list = [g.get("title") for g in goals if g.get("status") == "active"]
@@ -74,9 +77,9 @@ def generate_workout_plan(bmi: float, goals: list, fitness_level: str, equipment
     )
 
     try:
-        logger.info("Sending request to GPT-4o for workout planning")
+        logger.info("Sending request to Groq for workout planning")
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="llama3-70b-8192",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
             temperature=0.2

@@ -4,7 +4,7 @@ from openai import OpenAI
 import qdrant_client
 from llama_index.core import VectorStoreIndex
 from llama_index.vector_stores.qdrant import QdrantVectorStore
-from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.embeddings.fastembed import FastEmbedEmbedding
 from ingestion import get_qdrant_client, get_collection_name
 import logging
 
@@ -25,7 +25,7 @@ def retrieve_and_generate(query: str, doc_id: str, user_id: str, chat_history: l
 
     # 2. Setup retriever
     vector_store = QdrantVectorStore(client=client, collection_name=collection_name)
-    embed_model = OpenAIEmbedding(model="text-embedding-3-small")
+    embed_model = FastEmbedEmbedding(model_name="BAAI/bge-small-en-v1.5")
     index = VectorStoreIndex.from_vector_store(vector_store, embed_model=embed_model)
     
     # Retrieve top 5 chunks
@@ -83,9 +83,12 @@ def retrieve_and_generate(query: str, doc_id: str, user_id: str, chat_history: l
         return
         
     try:
-        openai_client = OpenAI(api_key=api_key)
+        openai_client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.groq.com/openai/v1"
+        )
         response = openai_client.chat.completions.create(
-            model="gpt-4o",
+            model="llama3-8b-8192",
             messages=messages,
             stream=True
         )

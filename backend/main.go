@@ -58,6 +58,12 @@ func main() {
 	r.Use(middleware.CORS)
 
 	// Root Healthcheck
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"status":"online","service":"FitMind Backend API","message":"Backend server is running successfully! Access the frontend at http://localhost:5173"}`))
+	})
+
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)

@@ -1,0 +1,59 @@
+# Env Files (Secrets)
+.env
+.env.*
+*.env
+backend/.env
+rag-service/.env
+frontend/.env
+
+# Local database / storage
+rag-service/qdrant_db/
+qdrant_data/
+
+# Python Virtual Environment and Caches
+venv/
+**/venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node.js
+node_modules/
+**/node_modules/
+.npm
+.eslintcache
+
+# SvelteKit/Vite Output
+.svelte-kit/
+**/build/
+.vercel/
+.netlify/
+.wrangler/
+dist/
+/package
+
+# Go binaries and tools
+backend/backend
+backend/*.exe
+*.out
+*.test
+*.prof
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDEs/Editor configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
