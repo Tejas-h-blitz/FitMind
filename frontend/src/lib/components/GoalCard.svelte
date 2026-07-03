@@ -46,12 +46,12 @@
 </script>
 
 <div
-	class="flex items-center justify-between rounded-xl border p-4 transition-all duration-350 select-none
+	class="flex items-center justify-between rounded-xl border p-4 transition-all duration-300 select-none hover:-translate-y-0.5
 		{isCompleted
-			? 'border-slate-800 bg-slate-900/10 opacity-70'
+			? 'border-slate-900 bg-slate-950/20 opacity-60'
 			: isOverdue(goal.target_date)
-				? 'border-red-900/30 bg-red-950/5 hover:border-red-500/20'
-				: 'border-slate-850 bg-slate-950/60 hover:border-slate-700/50'
+				? 'border-red-950/40 bg-red-950/5 hover:border-red-500/20 hover:shadow-lg hover:shadow-red-950/5'
+				: 'border-slate-850 bg-slate-900/10 hover:border-slate-700/40 hover:bg-slate-900/30'
 		}"
 >
 	<div class="flex items-center gap-3.5 flex-1 min-w-0">
@@ -59,27 +59,27 @@
 		<button
 			onclick={handleToggleClick}
 			disabled={isToggling}
-			class="flex items-center justify-center p-1 rounded-lg hover:bg-slate-900 text-slate-400 hover:text-emerald-400 transition-colors disabled:opacity-50 cursor-pointer"
+			class="flex items-center justify-center p-1 rounded-lg hover:bg-slate-900/50 text-slate-450 hover:text-emerald-400 transition-colors disabled:opacity-50 cursor-pointer"
 			aria-label="Toggle goal status"
 		>
 			{#if isCompleted}
 				<CheckCircle2 class="h-5.5 w-5.5 text-emerald-500 fill-emerald-500/10" />
 			{:else}
-				<Square class="h-5.5 w-5.5 text-slate-600" />
+				<Square class="h-5.5 w-5.5 text-slate-650" />
 			{/if}
 		</button>
 
 		<div class="min-w-0 flex-1">
 			<span
-				class="block text-sm font-semibold text-slate-200 truncate leading-snug
+				class="block text-sm font-bold text-slate-200 truncate leading-snug transition-all
 					{isCompleted ? 'line-through text-slate-500' : ''}"
 			>
 				{goal.title}
 			</span>
 			
 			{#if goal.target_date}
-				<span class="inline-flex items-center gap-1 mt-1 text-[11px] font-medium
-					{isOverdue(goal.target_date) ? 'text-red-400' : 'text-slate-400'}"
+				<span class="inline-flex items-center gap-1 mt-1 text-[10px] font-bold tracking-tight
+					{isOverdue(goal.target_date) ? 'text-red-400' : 'text-slate-500'}"
 				>
 					<Calendar class="h-3 w-3" />
 					Target: {formatDate(goal.target_date)}
@@ -94,15 +94,15 @@
 	<!-- Status Badge -->
 	<div class="ml-4 shrink-0">
 		{#if isCompleted}
-			<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950/40 border border-emerald-500/25 text-emerald-400 uppercase tracking-wider">
+			<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-950/45 border border-emerald-500/20 text-emerald-450 uppercase tracking-wider">
 				Done
 			</span>
 		{:else if isOverdue(goal.target_date)}
-			<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-950/40 border border-red-500/25 text-red-400 uppercase tracking-wider">
+			<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-red-950/45 border border-red-500/20 text-red-450 uppercase tracking-wider animate-pulse">
 				Overdue
 			</span>
 		{:else}
-			<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-900 border border-slate-800 text-slate-400 uppercase tracking-wider">
+			<span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-slate-900 border border-slate-800 text-slate-450 uppercase tracking-wider">
 				Active
 			</span>
 		{/if}

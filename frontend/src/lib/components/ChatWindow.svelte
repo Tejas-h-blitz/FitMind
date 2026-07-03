@@ -184,21 +184,21 @@
 	}
 </script>
 
-<div class="flex flex-col h-[calc(100vh-12rem)] min-h-[450px] rounded-xl border border-slate-800 bg-slate-950 overflow-hidden shadow-2xl">
+<div class="flex flex-col h-[calc(100vh-12rem)] min-h-[480px] rounded-2xl border border-slate-850 bg-slate-950/40 overflow-hidden shadow-2xl backdrop-blur-md">
 	<!-- Chat Header -->
-	<div class="flex justify-between items-center px-6 py-4 border-b border-slate-800 bg-slate-900/40">
+	<div class="flex justify-between items-center px-6 py-4.5 border-b border-slate-900 bg-slate-950/60">
 		<div class="flex items-center gap-3">
 			<div class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></div>
 			<div>
-				<h2 class="text-sm font-semibold text-slate-100">AI Medical Document Analyst</h2>
-				<p class="text-xs text-slate-400">Context-aware RAG advisor</p>
+				<h2 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider">AI Medical Document Analyst</h2>
+				<p class="text-[10px] text-slate-500 font-bold mt-0.5">Context-aware RAG advisor</p>
 			</div>
 		</div>
 		
 		{#if messages.length > 0}
 			<button
 				onclick={handleClear}
-				class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-red-400 rounded-lg hover:bg-red-950/20 border border-transparent hover:border-red-500/25 transition-all cursor-pointer"
+				class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-400 hover:text-rose-400 rounded-lg hover:bg-rose-950/15 border border-transparent hover:border-rose-500/15 transition-all cursor-pointer"
 			>
 				<Trash2 class="h-3.5 w-3.5" />
 				<span>Clear Chat</span>
@@ -212,15 +212,15 @@
 		class="flex-1 overflow-y-auto px-6 py-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-800"
 	>
 		{#if messages.length === 0 && !streamingMessage}
-			<div class="h-full flex flex-col justify-center items-center text-center p-8 max-w-md mx-auto">
-				<div class="p-4 rounded-full bg-emerald-500/10 text-emerald-400 mb-4 animate-bounce">
-					<Brain class="h-10 w-10" />
+			<div class="h-full flex flex-col justify-center items-center text-center p-8 max-w-sm mx-auto select-none">
+				<div class="p-4 rounded-full bg-emerald-500/10 text-emerald-400 mb-4 border border-emerald-500/10">
+					<Brain class="h-10 w-10 animate-pulse" />
 				</div>
-				<h3 class="font-bold text-slate-100 text-lg">Start Health Analysis</h3>
-				<p class="text-slate-400 text-sm mt-2 leading-relaxed">
+				<h3 class="font-extrabold text-slate-200 text-base tracking-tight">Start Health Analysis</h3>
+				<p class="text-slate-450 text-xs mt-2.5 leading-relaxed font-semibold">
 					Ask any questions about this document. For example: <br>
-					<span class="text-emerald-400 italic">"Are my cholesterol levels within range?"</span> or <br>
-					<span class="text-emerald-400 italic">"What is the recommended protein intake in this diet?"</span>
+					<span class="text-emerald-450 italic">"Are my cholesterol levels within range?"</span> or <br>
+					<span class="text-emerald-450 italic">"What is the recommended protein intake?"</span>
 				</p>
 			</div>
 		{:else}
@@ -238,7 +238,7 @@
 						<Brain class="h-5 w-5 animate-pulse" />
 					</div>
 					<div class="flex flex-col gap-2 max-w-[70%]">
-						<div class="rounded-xl px-4 py-3 bg-slate-900 border border-slate-800 rounded-tl-none">
+						<div class="rounded-xl px-4 py-3 bg-slate-900 border border-slate-850 rounded-tl-none">
 							<div class="flex items-center gap-1.5 py-1">
 								<span class="h-2 w-2 bg-slate-500 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
 								<span class="h-2 w-2 bg-slate-500 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
@@ -252,19 +252,19 @@
 	</div>
 
 	<!-- Input Area -->
-	<div class="p-4 border-t border-slate-800 bg-slate-900/20">
+	<div class="p-4 border-t border-slate-900 bg-slate-950/60">
 		<form onsubmit={handleSend} class="flex gap-3">
 			<input
 				type="text"
 				bind:value={queryText}
 				placeholder={isGenerating ? "AI is typing..." : "Ask FitMind advisor..."}
 				disabled={isGenerating}
-				class="flex-1 px-4 py-3 rounded-lg border border-slate-800 bg-slate-950 text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all disabled:opacity-50"
+				class="flex-1 px-4 py-3 rounded-xl border border-slate-850 bg-slate-950 text-slate-100 placeholder-slate-600 text-xs font-semibold focus:outline-none focus:border-emerald-500/80 transition-colors disabled:opacity-50"
 			/>
 			<button
 				type="submit"
 				disabled={isGenerating || !queryText.trim()}
-				class="flex items-center justify-center h-11 w-11 shrink-0 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+				class="flex items-center justify-center h-11 w-11 shrink-0 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 active:translate-y-0"
 				aria-label="Send query"
 			>
 				<Send class="h-4 w-4" />

@@ -6,6 +6,7 @@
 	import { supabase } from '$lib/supabase';
 	import { api, type UserProfile } from '$lib/api';
 	import Navbar from '$lib/components/Navbar.svelte';
+	import CommandPalette from '$lib/components/CommandPalette.svelte';
 	import { Toaster } from 'svelte-sonner';
 
 	let { children } = $props();
@@ -84,14 +85,19 @@
 </script>
 
 <Toaster theme="dark" position="bottom-right" richColors />
+<CommandPalette />
 
-<div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+<div class="relative min-h-screen text-slate-100 flex flex-col font-sans bg-slate-950 overflow-x-hidden">
+	<!-- Ambient background effects -->
+	<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-950/10 via-slate-950 to-slate-950 -z-10 pointer-events-none"></div>
+	<div class="absolute inset-0 bg-grid-pattern [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 -z-10 pointer-events-none"></div>
+
 	{#if isInitialized}
 		{#if !isAuthPage && !isLandingPage && session}
 			<Navbar streakCount={userProfile?.streak_count || 0} />
 		{/if}
 
-		<main class="flex-1">
+		<main class="flex-1 relative z-10 {!isAuthPage && !isLandingPage && session ? 'pt-16' : ''}">
 			{@render children()}
 		</main>
 	{:else}

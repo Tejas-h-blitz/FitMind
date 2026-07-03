@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { api, type WorkoutPlan } from '$lib/api';
 	import WorkoutDayCard from '$lib/components/WorkoutDayCard.svelte';
+	import ProgressSteps from '$lib/components/ProgressSteps.svelte';
 	import { Dumbbell, ShieldAlert, Sparkles, ArrowRight, Check, RefreshCw, Trash2, Heart, Award, Flame } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -12,6 +13,33 @@
 	let workoutPlan = $state<WorkoutPlan | null>(null);
 	let isLoading = $state(true);
 	let isGenerating = $state(false);
+
+	// Wizard step
+	let activeSetupStep = $state(0);
+	let currentStep = $derived(() => {
+		if (workoutPlan) return 3;
+		return activeSetupStep;
+	});
+
+	// Streaming states
+	let displayedCoaching = $state('');
+	let isStreaming = $state(false);
+
+	function simulateStream(fullCoaching: string) {
+		isStreaming = true;
+		displayedCoaching = '';
+
+		let i = 0;
+		const cInterval = setInterval(() => {
+			if (i < fullCoaching.length) {
+				displayedCoaching += fullCoaching[i];
+				i++;
+			} else {
+				clearInterval(cInterval);
+				isStreaming = false;
+			}
+		}, 4);
+	}
 
 	// Loading messages cycle state
 	let loadingMsgIndex = $state(0);
@@ -57,6 +85,7 @@
 			const res = await api.generateWorkoutPlan(fitnessLevel, equipment, daysPerWeek);
 			if (res.success && res.data) {
 				workoutPlan = res.data;
+				simulateStream(res.data.coaching_reasoning);
 				toast.success('Your custom workout program is ready!');
 			} else {
 				toast.error(res.error || 'Failed to generate workout plan');
@@ -87,21 +116,23 @@
 	<title>AI Workout Program Generator - FitMind</title>
 </svelte:head>
 
-<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
 	<!-- Header -->
-	<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+	<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 pb-6 border-b border-slate-900">
 		<div>
-			<h1 class="text-2xl sm:text-3xl font-extrabold text-slate-100 flex items-center gap-2">
-				<Dumbbell class="text-emerald-400 h-7 w-7" />
+			<h1 class="text-3xl font-black text-slate-100 tracking-tight flex items-center gap-3">
+				<span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 animate-glow-pulse">
+					<Dumbbell class="h-6 w-6" />
+				</span>
 				<span>AI Workout Plan Generator</span>
 			</h1>
-			<p class="text-slate-400 text-sm mt-1">Design a structured progressive overload routine incorporating your BMI and fitness goals.</p>
+			<p class="text-slate-400 text-sm mt-2">Design a structured progressive overload routine incorporating your BMI and fitness goals.</p>
 		</div>
 
 		{#if workoutPlan}
 			<button
 				onclick={handleDeletePlan}
-				class="inline-flex items-center justify-center gap-2 py-2 px-3.5 text-xs font-bold text-slate-400 hover:text-rose-450 bg-slate-900/60 hover:bg-rose-950/20 border border-slate-800 hover:border-rose-500/20 rounded-lg cursor-pointer transition-all"
+				class="inline-flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold text-slate-400 hover:text-rose-450 bg-slate-900/60 hover:bg-rose-950/20 border border-slate-850 hover:border-rose-500/20 rounded-xl cursor-pointer transition-all duration-300"
 			>
 				<Trash2 class="h-3.5 w-3.5" />
 				<span>Delete Program</span>
@@ -110,9 +141,9 @@
 	</div>
 
 	{#if isLoading}
-		<div class="h-96 flex flex-col justify-center items-center">
+		<div class="h-[70vh] flex flex-col justify-center items-center">
 			<div class="h-10 w-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-			<span class="text-sm font-semibold text-slate-400 mt-4">Retrieving your workout status...</span>
+			<span class="text-sm font-semibold text-slate-400 mt-4 animate-pulse">Retrieving your workout status...</span>
 		</div>
 	{:else if isGenerating}
 		<!-- Generating loading screen -->
@@ -121,23 +152,27 @@
 				<div class="h-16 w-16 border-4 border-emerald-500/20 border-t-emerald-400 rounded-full animate-spin"></div>
 				<Dumbbell class="absolute h-6 w-6 text-emerald-400 animate-bounce" />
 			</div>
-			<h3 class="text-lg font-bold text-slate-200 animate-pulse">{loadingMessages[loadingMsgIndex]}</h3>
-			<p class="text-xs text-slate-500 mt-2 leading-relaxed">Calculating rep targets, active recovery breaks, and form adjustments based on your metrics.</p>
+			<h3 class="text-base font-extrabold text-slate-200 animate-pulse">{loadingMessages[loadingMsgIndex]}</h3>
+			<p class="text-[11px] text-slate-500 mt-2.5 leading-relaxed font-semibold">Calculating rep targets, active recovery breaks, and form adjustments based on your metrics.</p>
 		</div>
 	{:else}
 		<!-- Main view -->
 		{#if !workoutPlan}
-			<div class="space-y-8 bg-slate-900/10 border border-slate-800/60 p-6 sm:p-8 rounded-2xl backdrop-blur-sm">
-				<!-- Step 1: Fitness Level -->
-				<div class="space-y-3">
-					<span class="block text-sm font-bold text-slate-355">
+			<div class="mb-8">
+				<ProgressSteps steps={['Experience', 'Equipment', 'Frequency', 'Generate']} currentStep={currentStep()} />
+			</div>
+
+			<div class="space-y-8 bg-slate-955/45 border border-slate-850 p-6 sm:p-8 rounded-2xl shadow-xl backdrop-blur-md">
+				<!-- Step 1: Experience level selection -->
+				<div class="space-y-3.5">
+					<span class="block text-sm font-bold text-slate-200">
 						Step 1: Select Your Experience Level
 					</span>
 					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 						<!-- Card 1: Beginner -->
 						<button
-							onclick={() => fitnessLevel = 'beginner'}
-							class="p-5 rounded-xl border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between h-[130px] {fitnessLevel === 'beginner' ? 'bg-emerald-950/20 border-emerald-500 shadow-md shadow-emerald-950/30' : 'bg-slate-950/40 border-slate-850 hover:border-slate-700'}"
+							onclick={() => { fitnessLevel = 'beginner'; activeSetupStep = 1; }}
+							class="p-5 rounded-xl border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between h-[140px] hover:-translate-y-0.5 hover:shadow-lg {fitnessLevel === 'beginner' ? 'bg-emerald-950/20 border-emerald-500 shadow-md shadow-emerald-950/30' : 'bg-slate-950/40 border-slate-850 hover:border-slate-700'}"
 						>
 							<div class="flex justify-between items-center w-full">
 								<span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
@@ -149,14 +184,14 @@
 							</div>
 							<div>
 								<span class="block text-sm font-bold text-slate-200">Beginner</span>
-								<span class="block text-[11px] text-slate-500 mt-0.5">Just starting out or resuming fitness</span>
+								<span class="block text-[10px] text-slate-500 font-semibold mt-1">Just starting out or resuming fitness</span>
 							</div>
 						</button>
 
 						<!-- Card 2: Intermediate -->
 						<button
-							onclick={() => fitnessLevel = 'intermediate'}
-							class="p-5 rounded-xl border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between h-[130px] {fitnessLevel === 'intermediate' ? 'bg-emerald-950/20 border-emerald-500 shadow-md shadow-emerald-950/30' : 'bg-slate-950/40 border-slate-850 hover:border-slate-700'}"
+							onclick={() => { fitnessLevel = 'intermediate'; activeSetupStep = 1; }}
+							class="p-5 rounded-xl border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between h-[140px] hover:-translate-y-0.5 hover:shadow-lg {fitnessLevel === 'intermediate' ? 'bg-emerald-950/20 border-emerald-500 shadow-md shadow-emerald-950/30' : 'bg-slate-950/40 border-slate-850 hover:border-slate-700'}"
 						>
 							<div class="flex justify-between items-center w-full">
 								<span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
@@ -168,14 +203,14 @@
 							</div>
 							<div>
 								<span class="block text-sm font-bold text-slate-200">Intermediate</span>
-								<span class="block text-[11px] text-slate-500 mt-0.5">6+ months of regular training experience</span>
+								<span class="block text-[10px] text-slate-500 font-semibold mt-1">6+ months of regular training experience</span>
 							</div>
 						</button>
 
 						<!-- Card 3: Advanced -->
 						<button
-							onclick={() => fitnessLevel = 'advanced'}
-							class="p-5 rounded-xl border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between h-[130px] {fitnessLevel === 'advanced' ? 'bg-emerald-950/20 border-emerald-500 shadow-md shadow-emerald-950/30' : 'bg-slate-950/40 border-slate-850 hover:border-slate-700'}"
+							onclick={() => { fitnessLevel = 'advanced'; activeSetupStep = 1; }}
+							class="p-5 rounded-xl border text-left cursor-pointer transition-all duration-300 flex flex-col justify-between h-[140px] hover:-translate-y-0.5 hover:shadow-lg {fitnessLevel === 'advanced' ? 'bg-emerald-950/20 border-emerald-500 shadow-md shadow-emerald-950/30' : 'bg-slate-950/40 border-slate-850 hover:border-slate-700'}"
 						>
 							<div class="flex justify-between items-center w-full">
 								<span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
@@ -187,7 +222,7 @@
 							</div>
 							<div>
 								<span class="block text-sm font-bold text-slate-200">Advanced</span>
-								<span class="block text-[11px] text-slate-500 mt-0.5">2+ years of consistent heavy training</span>
+								<span class="block text-[10px] text-slate-500 font-semibold mt-1">2+ years of consistent heavy training</span>
 							</div>
 						</button>
 					</div>
@@ -195,7 +230,7 @@
 
 				<!-- Step 2: Equipment select -->
 				<div class="space-y-3">
-					<span class="block text-sm font-bold text-slate-355">
+					<span class="block text-sm font-bold text-slate-200">
 						Step 2: Available Training Equipment
 					</span>
 					<div class="flex gap-3 flex-wrap">
@@ -205,11 +240,11 @@
 							{ id: 'full_gym', label: 'Full Gym Access' }
 						] as eq}
 							<button
-								onclick={() => equipment = eq.id as any}
-								class="px-4 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center gap-2 {equipment === eq.id ? 'bg-emerald-600 border-emerald-500 text-white shadow-md' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'}"
+								onclick={() => { equipment = eq.id as any; activeSetupStep = 2; }}
+								class="px-4 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center gap-2 {equipment === eq.id ? 'bg-emerald-600 border-emerald-500/30 text-white shadow-md hover:-translate-y-0.5' : 'bg-slate-950 border-slate-850 text-slate-450 hover:text-slate-200 hover:border-slate-700'}"
 							>
 								{#if equipment === eq.id}
-									<Check class="h-3.5 w-3.5" />
+									<Check class="h-3.5 w-3.5 text-white" />
 								{/if}
 								<span>{eq.label}</span>
 							</button>
@@ -220,17 +255,17 @@
 				<!-- Step 3: Days Slider -->
 				<div class="space-y-3">
 					<div class="flex justify-between items-center">
-						<span class="block text-sm font-bold text-slate-355">
+						<span class="block text-sm font-bold text-slate-200">
 							Step 3: Training Frequency
 						</span>
-						<span class="text-xs font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+						<span class="text-xs font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/25 px-2.5 py-0.5 rounded-md">
 							{daysPerWeek} days / week
 						</span>
 					</div>
-					<p class="text-xs text-slate-500">How many days are you available to work out each week?</p>
+					<p class="text-xs text-slate-450 font-semibold leading-relaxed">How many days are you available to work out each week?</p>
 					
 					<div class="flex items-center gap-4 pt-2">
-						<span class="text-xs text-slate-500">3 Days</span>
+						<span class="text-xs text-slate-500 font-bold">3 Days</span>
 						<input
 							type="range"
 							min="3"
@@ -238,15 +273,15 @@
 							bind:value={daysPerWeek}
 							class="w-full h-2 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
 						/>
-						<span class="text-xs text-slate-500">6 Days</span>
+						<span class="text-xs text-slate-500 font-bold">6 Days</span>
 					</div>
 				</div>
 
 				<!-- Submit -->
-				<div class="pt-4 border-t border-slate-900 flex justify-end">
+				<div class="pt-6 border-t border-slate-900 flex justify-end">
 					<button
 						onclick={handleGenerate}
-						class="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-3 px-6 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow-md transition-all cursor-pointer"
+						class="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-3 px-6 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow-md transition-all cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
 					>
 						<span>Generate My Workout Plan</span>
 						<ArrowRight class="h-4 w-4" />
@@ -257,36 +292,38 @@
 			<!-- Program view -->
 			<div class="space-y-8">
 				<!-- Hero section -->
-				<div class="relative rounded-2xl border border-emerald-500/10 bg-emerald-950/5 p-6 flex items-center justify-between flex-wrap gap-4 overflow-hidden">
+				<div class="relative rounded-2xl border border-slate-850 bg-slate-950/40 p-6 flex items-center justify-between flex-wrap gap-4 overflow-hidden shadow-xl backdrop-blur-md">
 					<div class="absolute -right-16 -top-16 h-36 w-36 rounded-full bg-emerald-500/5 blur-2xl"></div>
 					<div class="relative space-y-1">
-						<span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Active Training Program</span>
-						<h2 class="text-xl sm:text-2xl font-extrabold text-slate-100 capitalize">{workoutPlan.program_name}</h2>
-						<p class="text-xs text-slate-400">Duration: <span class="text-slate-200 font-bold">{workoutPlan.duration_weeks} weeks</span> • Level: <span class="text-slate-200 font-bold capitalize">{workoutPlan.fitness_level}</span></p>
+						<span class="text-[9px] font-extrabold text-emerald-450 uppercase tracking-wider">Active Training Program</span>
+						<h2 class="text-2xl font-black text-slate-100 capitalize tracking-tight">{workoutPlan.program_name}</h2>
+						<p class="text-xs text-slate-400 font-medium">
+							Duration: <span class="text-slate-200 font-bold">{workoutPlan.duration_weeks} weeks</span> • Level: <span class="text-slate-200 font-bold capitalize">{workoutPlan.fitness_level}</span>
+						</p>
 					</div>
 
 					<button
 						onclick={() => workoutPlan = null}
-						class="relative inline-flex items-center justify-center gap-1.5 py-2 px-4 text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-950/30 hover:bg-emerald-950/50 border border-emerald-500/20 rounded-lg cursor-pointer transition-all"
+						class="relative inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-emerald-405 hover:text-emerald-350 bg-emerald-950/20 hover:bg-emerald-950/40 border border-emerald-500/25 rounded-xl cursor-pointer hover:-translate-y-0.5 transition-all duration-300"
 					>
-						<RefreshCw class="h-3.5 w-3.5" />
+						<RefreshCw class="h-3.5 w-3.5 animate-spin-hover" />
 						<span>New Configuration</span>
 					</button>
 				</div>
 
 				<!-- Reasoning box -->
-				<div class="p-5 rounded-xl border border-slate-800 bg-slate-900/35 leading-relaxed">
+				<div class="p-5 rounded-2xl border border-slate-850 bg-slate-950/20 shadow-md">
 					<h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Coach's Recommendation Notes</h3>
-					<p class="text-sm text-slate-250 mt-2 italic leading-relaxed">
-						"{workoutPlan.reasoning}"
+					<p class="text-sm text-slate-200 mt-2.5 leading-relaxed italic {isStreaming ? 'after:content-[\'▋\'] after:animate-pulse after:ml-0.5 after:text-emerald-400' : ''}">
+						"{isStreaming ? displayedCoaching : workoutPlan.reasoning}"
 					</p>
 				</div>
 
 				<!-- Schedule -->
 				<div class="space-y-4">
-					<div class="flex items-center justify-between">
-						<h3 class="text-base font-bold text-slate-200">Weekly Training Schedule</h3>
-						<span class="text-xs text-slate-500">Tap cards to inspect exercise details & form tips</span>
+					<div class="flex items-center justify-between pb-1 border-b border-slate-900">
+						<h3 class="text-base font-extrabold text-slate-200 tracking-tight">Weekly Training Schedule</h3>
+						<span class="text-xs text-slate-500 font-semibold">Tap cards to inspect exercise details & form tips</span>
 					</div>
 
 					<!-- Scroll container on mobile, Grid on desktop -->
@@ -300,29 +337,29 @@
 				<!-- Notes checklist -->
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 					<!-- Progression -->
-					<div class="p-5 rounded-xl border border-slate-850 bg-slate-950/40 space-y-2">
+					<div class="p-5 rounded-2xl border border-slate-850 bg-slate-950/40 space-y-2">
 						<h4 class="text-xs font-bold uppercase tracking-wider text-emerald-450 flex items-center gap-1.5">
 							<span>📈 Progression Notes</span>
 						</h4>
-						<p class="text-xs text-slate-350 leading-relaxed font-medium">
+						<p class="text-xs text-slate-350 leading-relaxed font-semibold">
 							{workoutPlan.progression_notes}
 						</p>
 					</div>
 
 					<!-- Safety -->
-					<div class="p-5 rounded-xl border border-slate-850 bg-slate-950/40 space-y-2">
-						<h4 class="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
-							<ShieldAlert class="h-4 w-4" />
+					<div class="p-5 rounded-2xl border border-slate-850 bg-slate-950/40 space-y-2">
+						<h4 class="text-xs font-bold uppercase tracking-wider text-rose-450 flex items-center gap-1.5">
+							<ShieldAlert class="h-4 w-4 text-rose-405" />
 							<span>⚠️ Safety Guidelines</span>
 						</h4>
-						<p class="text-xs text-slate-350 leading-relaxed font-medium">
+						<p class="text-xs text-slate-350 leading-relaxed font-semibold">
 							{workoutPlan.safety_notes}
 						</p>
 					</div>
 				</div>
 
 				<!-- Disclaimer -->
-				<div class="text-[10px] text-slate-550 italic text-center max-w-lg mx-auto">
+				<div class="text-[10px] text-slate-500 italic text-center max-w-lg mx-auto">
 					🏋️ Medical Disclaimer: Please consult a physician before starting any exercise program, especially if you have chronic health conditions. Stop working out immediately if you experience dizziness or shortness of breath.
 				</div>
 			</div>

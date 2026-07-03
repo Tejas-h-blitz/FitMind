@@ -44,24 +44,29 @@
 	}
 </script>
 
-<div class="relative bg-slate-950 min-h-screen text-slate-100 flex flex-col justify-center items-center px-4">
-	<!-- Background grid overlay -->
-	<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-950/10 via-slate-950 to-slate-950 -z-10"></div>
+<svelte:head>
+	<title>Sign Up - FitMind AI</title>
+</svelte:head>
 
-	<div class="w-full max-w-md bg-slate-900/40 border border-slate-800/80 rounded-2xl p-8 backdrop-blur-md shadow-2xl">
+<div class="relative min-h-screen text-slate-100 flex flex-col justify-center items-center px-4 bg-slate-950 overflow-hidden">
+	<!-- Background grid overlays -->
+	<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-950/15 via-slate-950 to-slate-950 -z-10 pointer-events-none"></div>
+	<div class="absolute inset-0 bg-grid-pattern [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 -z-10 pointer-events-none"></div>
+
+	<div class="w-full max-w-md bg-slate-950/45 border border-slate-850 rounded-2xl p-8 backdrop-blur-md shadow-2xl relative z-10">
 		<!-- Brand Header -->
 		<div class="flex flex-col items-center mb-8">
-			<div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-400 mb-3">
-				<Brain class="h-8 w-8" />
+			<div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-400 mb-3 border border-emerald-500/10">
+				<Brain class="h-8 w-8 animate-pulse" />
 			</div>
-			<h2 class="text-2xl font-extrabold text-slate-100">Create Account</h2>
-			<p class="text-slate-400 text-sm mt-1">Get started with your health companion</p>
+			<h2 class="text-2xl font-black text-slate-100 tracking-tight">Create Account</h2>
+			<p class="text-slate-400 text-xs mt-1.5 font-bold uppercase tracking-wider">Get started with your health companion</p>
 		</div>
 
 		<!-- Error Message Alert -->
 		{#if errorMsg}
-			<div class="flex items-center gap-2 p-3.5 mb-5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-400 text-xs">
-				<AlertTriangle class="h-4 w-4 shrink-0" />
+			<div class="flex items-center gap-2.5 p-4 mb-5 rounded-xl bg-rose-955/10 border border-rose-500/20 text-rose-450 text-xs font-semibold">
+				<AlertTriangle class="h-4.5 w-4.5 shrink-0" />
 				<span>{errorMsg}</span>
 			</div>
 		{/if}
@@ -69,9 +74,9 @@
 		<!-- Sign Up Form -->
 		<form onsubmit={handleSignup} class="space-y-4">
 			<div>
-				<label for="fullName" class="block text-xs font-semibold text-slate-400 mb-1.5">Full Name</label>
+				<label for="fullName" class="block text-xs font-bold text-slate-455 mb-1.5">Full Name</label>
 				<div class="relative">
-					<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 pointer-events-none">
+					<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none">
 						<User class="h-4 w-4" />
 					</span>
 					<input
@@ -81,15 +86,15 @@
 						placeholder="John Doe"
 						required
 						disabled={isLoading}
-						class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-slate-800 bg-slate-950 text-slate-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all disabled:opacity-50"
+						class="w-full pl-10 pr-4 py-2.5 text-xs font-semibold rounded-lg border border-slate-855 bg-slate-950/60 text-slate-100 focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 placeholder-slate-650"
 					/>
 				</div>
 			</div>
 
 			<div>
-				<label for="email" class="block text-xs font-semibold text-slate-400 mb-1.5">Email Address</label>
+				<label for="email" class="block text-xs font-bold text-slate-455 mb-1.5">Email Address</label>
 				<div class="relative">
-					<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 pointer-events-none">
+					<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none">
 						<Mail class="h-4 w-4" />
 					</span>
 					<input
@@ -99,15 +104,15 @@
 						placeholder="you@example.com"
 						required
 						disabled={isLoading}
-						class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-slate-800 bg-slate-950 text-slate-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all disabled:opacity-50"
+						class="w-full pl-10 pr-4 py-2.5 text-xs font-semibold rounded-lg border border-slate-855 bg-slate-950/60 text-slate-100 focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 placeholder-slate-650"
 					/>
 				</div>
 			</div>
 
 			<div>
-				<label for="password" class="block text-xs font-semibold text-slate-400 mb-1.5">Password</label>
+				<label for="password" class="block text-xs font-bold text-slate-455 mb-1.5">Password</label>
 				<div class="relative">
-					<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 pointer-events-none">
+					<span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none">
 						<Lock class="h-4 w-4" />
 					</span>
 					<input
@@ -118,7 +123,7 @@
 						minlength="8"
 						required
 						disabled={isLoading}
-						class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-slate-800 bg-slate-950 text-slate-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all disabled:opacity-50"
+						class="w-full pl-10 pr-4 py-2.5 text-xs font-semibold rounded-lg border border-slate-855 bg-slate-950/60 text-slate-100 focus:outline-none focus:border-emerald-500 transition-colors disabled:opacity-50 placeholder-slate-650"
 					/>
 				</div>
 			</div>
@@ -126,7 +131,7 @@
 			<button
 				type="submit"
 				disabled={isLoading}
-				class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-sm shadow-md transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+				class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs shadow-md transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-6 hover:-translate-y-0.5"
 			>
 				{#if isLoading}
 					<div class="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -138,10 +143,10 @@
 			</button>
 		</form>
 
-		<div class="mt-8 pt-6 border-t border-slate-800/60 text-center">
-			<p class="text-xs text-slate-400">
+		<div class="mt-8 pt-6 border-t border-slate-900 text-center">
+			<p class="text-xs text-slate-400 font-semibold">
 				Already have an account? 
-				<a href="/auth/login" class="text-emerald-400 font-semibold hover:underline ml-1">Log in here</a>
+				<a href="/auth/login" class="text-emerald-400 font-bold hover:underline ml-1">Log in here</a>
 			</p>
 		</div>
 	</div>
