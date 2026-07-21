@@ -3,7 +3,7 @@
 FitMind is a production-grade personal health advisor that implements a Retrieval-Augmented Generation (RAG) pipeline to analyze user's uploaded health documents (blood reports, diet charts, workout logs, medical summaries) and stream contextual, citation-referenced answers to their queries. It also includes health status tracking features (consecutive activity streaks, BMI log history, and goal management).
 
 ---
-  
+   
 ## Architecture Diagram
 
 ```
