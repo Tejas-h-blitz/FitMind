@@ -197,7 +197,7 @@ create table if not exists workout_plans (
   days_per_week int,
   created_at timestamptz default now()
 );
-
+ 
 alter table workout_plans enable row level security;
 create policy "Users can only access own workout plans"
   on workout_plans for all
