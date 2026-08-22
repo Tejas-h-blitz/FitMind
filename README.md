@@ -5,7 +5,7 @@ FitMind is a production-grade personal health advisor that implements a Retrieva
 ---
       
 ## Architecture Diagram
-
+ 
 ```
                  +---------------------------------------+
                  |          SVELTEKIT FRONTEND           |
