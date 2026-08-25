@@ -57,7 +57,7 @@ Ensure you have the following installed on your machine:
 4. An [OpenAI API Key](https://platform.openai.com) with credits.
 
 ---
-
+ 
 ## Local Setup Instructions
 
 ### 1. Supabase Schema Configuration
