@@ -43,7 +43,7 @@ FitMind is a production-grade personal health advisor that implements a Retrieva
 - **Frontend**: SvelteKit + TailwindCSS (v4) + Lucide Icons + Svelte-Sonner (Toasts)
 - **Backend API**: Go (Golang) + Chi Router + Go-JWT
 - **RAG Microservice**: Python + FastAPI + LlamaIndex + PyMuPDF
-- **Vector DB**: Qdrant (Self-hosted via Docker)
+- **Vector DB**: Qdrant (Self-hosted via Docker) 
 - **Storage/DB/Auth**: Supabase (Postgres, Storage, Go JWT verification)
 
 ---
@@ -236,7 +236,7 @@ SUPABASE_SERVICE_ROLE_KEY=[YOUR_SUPABASE_SERVICE_ROLE_KEY]
 
 ### 3. Execution
 Launch Qdrant, the Go API backend, and the Python RAG microservice:
-```bash
+```bash 
 docker-compose up --build
 ```
 
